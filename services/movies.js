@@ -22,6 +22,11 @@ class MoviesService {
     return updateMovieId;
   }
 
+  async updateDataMovie() {
+    const updateDataMovieId = await Promise.resolve(moviesMock[0].id);
+    return updateDataMovieId;
+  }
+
   async deleteMovie() {
     const deleteMovieId = await Promise.resolve(moviesMock[0].id);
     return deleteMovieId;
