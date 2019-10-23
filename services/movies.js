@@ -1,5 +1,5 @@
 // En esta capa dejamos la responsabilidad de servir los mocks es de la capa de servicio para tener un código mas reutulizable
-const { moviesMock } = require('../utils/mocks/movies');
+const { moviesMock } = require("../utils/mocks/movies");
 
 class MoviesService {
   async getMovies() {
