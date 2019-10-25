@@ -1,13 +1,16 @@
+const boom = require("@hapi/boom");
+
 // Por ahora siempre nos va a marcar como valido cualquier validacion que le pasemos
 function validate() {
   return false;
 }
 
 function validationHandler(schema, check = "body") {
-  return function(req, res, next) {
+  return function(err, req, res, next) {
     const error = validate(req[check], schema);
 
-    error ? next(new Error(error)) : next();
+    // boom.badRequest(error), lo que hace es devolernos el error de que los datos no son validos.
+    error ? next(boom.badRequest(error)) : next();
   };
 }
 
