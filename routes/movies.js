@@ -7,6 +7,14 @@ const express = require("express");
 // importar la capa de servicios
 const MoviesService = require("../services/movies");
 
+const {
+  movieIdSchema,
+  createMovieSchema,
+  updateMovieSchema
+} = require("../utils/schemas/movies");
+
+const validationHandler = require("../utils/middleware/validationHandler");
+
 function moviesApi(app) {
   const router = express.Router();
   app.use("/api/movies", router);
@@ -30,28 +38,36 @@ function moviesApi(app) {
     }
   });
 
-  router.get("/:movieId", async function(req, res, next) {
-    /**
-     * ¿En que casos utilxar req.query y req.params?
-     *
-     * req.query = es cuando utilizamos el signo de ? nombre de query y se puede concatenar
-     *
-     * req.params = es cuando los datos estan establecidosos en la url
-     */
-    const { movieId } = req.params;
+  router.get(
+    "/:movieId",
+    validationHandler({ movieId: movieIdSchema }, "params"),
+    async function(req, res, next) {
+      /**
+       * ¿En que casos utilxar req.query y req.params?
+       *
+       * req.query = es cuando utilizamos el signo de ? nombre de query y se puede concatenar
+       *
+       * req.params = es cuando los datos estan establecidosos en la url
+       */
+      const { movieId } = req.params;
 
-    try {
-      const movies = await moviesService.getMovie({ movieId });
-      res.status(200).json({
-        data: movies,
-        message: "movie retrieved"
-      });
-    } catch (error) {
-      next(error);
+      try {
+        const movies = await moviesService.getMovie({ movieId });
+        res.status(200).json({
+          data: movies,
+          message: "movie retrieved"
+        });
+      } catch (error) {
+        next(error);
+      }
     }
-  });
+  );
 
-  router.post("/", async function(req, res, next) {
+  router.post("/", validationHandler(createMovieSchema), async function(
+    req,
+    res,
+    next
+  ) {
     const { body: movie } = req;
 
     try {
@@ -65,23 +81,28 @@ function moviesApi(app) {
     }
   });
 
-  router.put("/:movieId", async function(req, res, next) {
-    const { movieId } = req.params;
-    const { body: movie } = req;
+  router.put(
+    "/:movieId",
+    validationHandler({ movieId: movieIdSchema }, "params"),
+    validationHandler(updateMovieSchema),
+    async function(req, res, next) {
+      const { movieId } = req.params;
+      const { body: movie } = req;
 
-    try {
-      const updatedMoevieId = await moviesService.updateMovie({
-        movieId,
-        movie
-      });
-      res.status(200).json({
-        data: updatedMoevieId,
-        message: "movies updated"
-      });
-    } catch (error) {
-      next(error);
+      try {
+        const updatedMoevieId = await moviesService.updateMovie({
+          movieId,
+          movie
+        });
+        res.status(200).json({
+          data: updatedMoevieId,
+          message: "movies updated"
+        });
+      } catch (error) {
+        next(error);
+      }
     }
-  });
+  );
 
   // router.patch('/:movieId', async function(req, res, next) {
   //   const { movieId } = req.params;
@@ -97,18 +118,22 @@ function moviesApi(app) {
   //   }
   // });
 
-  router.delete("/:movieId", async function(req, res, next) {
-    const { movieId } = req.params;
-    try {
-      const deletedMovieId = await moviesService.deleteMovie({ movieId });
-      res.status(200).json({
-        data: deletedMovieId,
-        message: "movies deleted"
-      });
-    } catch (error) {
-      next(error);
+  router.delete(
+    "/:movieId",
+    validationHandler({ movieId: movieIdSchema }, "params"),
+    async function(req, res, next) {
+      const { movieId } = req.params;
+      try {
+        const deletedMovieId = await moviesService.deleteMovie({ movieId });
+        res.status(200).json({
+          data: deletedMovieId,
+          message: "movies deleted"
+        });
+      } catch (error) {
+        next(error);
+      }
     }
-  });
+  );
 }
 
 module.exports = moviesApi;
