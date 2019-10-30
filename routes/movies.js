@@ -15,6 +15,14 @@ const {
 
 const validationHandler = require("../utils/middleware/validationHandler");
 
+// Funcionalidad para saber donde agregar cache
+const cacheResponse = require('../utils/cacheResponse');
+// tiempos de response
+const { 
+  FIVE_MINUTES_IN_SECONDS, 
+  SIXTY_MINUTES_IN_SECONDS 
+} = require('../utils/time');
+
 function moviesApi(app) {
   const router = express.Router();
   app.use("/api/movies", router);
@@ -23,6 +31,7 @@ function moviesApi(app) {
   const moviesService = new MoviesService();
 
   router.get("/", async function(req, res, next) {
+    cacheResponse(res, FIVE_MINUTES_IN_SECONDS);
     //Se obtiene de la lestura de la Request y Response Object
     const { tags } = req.query;
 
@@ -42,6 +51,7 @@ function moviesApi(app) {
     "/:movieId",
     validationHandler({ movieId: movieIdSchema }, "params"),
     async function(req, res, next) {
+      cacheResponse(res, SIXTY_MINUTES_IN_SECONDS);
       /**
        * ¿En que casos utilxar req.query y req.params?
        *
