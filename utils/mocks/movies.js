@@ -132,6 +132,26 @@ const moviesMock = [{
   ]
 }];
 
+
+// esta funcion nos va a permitir crear las peliculas filtradas
+function filteredMoviesMocks(tag) {
+  return moviesMock.filter(movie => movie.tags.includes(tag));
+}
+
+// creamos un mock de los servicios
+class MoviesServiceMock {
+  async getMovies() {
+    return Promise.resolve(moviesMock);
+  }
+
+  // Va a crear la primer pelicula de nuestro movies Mock
+  async createMovie() {
+    return Promise.resolve(moviesMock[0]);
+  }
+}
+
 module.exports = {
-  moviesMock
+  moviesMock,
+  filteredMoviesMocks,
+  MoviesServiceMock
 };
