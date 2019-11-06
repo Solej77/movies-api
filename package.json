@@ -26,6 +26,7 @@
   "dependencies": {
     "@hapi/boom": "^8.0.1",
     "@hapi/joi": "^15.1.0",
+    "bcrypt": "^3.0.6",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongodb": "^3.3.3"
@@ -57,6 +58,11 @@
   },
   "nyc": {
     "all": true,
-    "include": ["routes", "services", "lib", "utils"]
+    "include": [
+      "routes",
+      "services",
+      "lib",
+      "utils"
+    ]
   }
 }
