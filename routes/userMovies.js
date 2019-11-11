@@ -16,7 +16,7 @@ const { createUserMovieSchema } = require("../utils/schemas/userMovies");
 function userMoviesApi(app) {
   //Definicion de la ruta de la API de usuarios
   const router = express.Router();
-  app.user("/api/user-movies", router);
+  app.use("/api/user-movies", router);
 
   const userMoviesService = new UserMoviesService();
 
