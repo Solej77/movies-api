@@ -1,6 +1,9 @@
 //crear el server
 const express = require("express");
 
+//Importamos Passport
+const passport = require("passport");
+
 // capa de negocio
 const UserMoviesService = require("../services/userMovies");
 
@@ -11,6 +14,11 @@ const validationHandler = require("../utils/middleware/validationHandler");
 const { movieIdSchema } = require("../utils/schemas/movies");
 const { userIdSchema } = require("../utils/schemas/users");
 const { createUserMovieSchema } = require("../utils/schemas/userMovies");
+
+//JWT Strategy
+require("../utils/auth/strategies/jwt");
+
+// Con este atributos protegemos nuestras rutas passport.authenticate('jwt',{session:false})
 
 // Definicion de las rutas del usuario
 function userMoviesApi(app) {
@@ -23,6 +31,7 @@ function userMoviesApi(app) {
   // enpoint para obtener todas las peliculas del usuario
   router.get(
     "/",
+    passport.authenticate("jwt", { session: false }),
     validationHandler({ userId: userIdSchema }, "query"),
     async function(req, res, next) {
       const { userId } = req.query;
@@ -41,31 +50,33 @@ function userMoviesApi(app) {
   );
 
   // endpoint para agregar una pelicula a la lista de favoritos
-  router.post("/", validationHandler(createUserMovieSchema), async function(
-    req,
-    res,
-    next
-  ) {
-    // obtenemos del body el id del usuario y el id de la pelicula (userMovie)
-    const { body: userMovie } = req;
+  router.post(
+    "/",
+    passport.authenticate("jwt", { session: false }),
+    validationHandler(createUserMovieSchema),
+    async function(req, res, next) {
+      // obtenemos del body el id del usuario y el id de la pelicula (userMovie)
+      const { body: userMovie } = req;
 
-    try {
-      const createdUserMovieId = await userMoviesService.createUserMovie({
-        userMovie
-      });
+      try {
+        const createdUserMovieId = await userMoviesService.createUserMovie({
+          userMovie
+        });
 
-      res.status(201).json({
-        data: createdUserMovieId,
-        message: "user movie created"
-      });
-    } catch (err) {
-      next(err);
+        res.status(201).json({
+          data: createdUserMovieId,
+          message: "user movie created"
+        });
+      } catch (err) {
+        next(err);
+      }
     }
-  });
+  );
 
   // endpoint para eliminar una pelicula de la lista de favoritos del usuario
   router.delete(
     "/:userMovieId",
+    passport.authenticate("jwt", { session: false }),
     validationHandler({ userMovieId: movieIdSchema }, "params"),
     async function(req, res, next) {
       const { userMovieId } = req.params;
