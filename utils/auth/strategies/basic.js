@@ -1,21 +1,21 @@
-const passport = require("passport");
-const { BasicStrategy } = require("passport-http");
+const passport = require('passport');
+const { BasicStrategy } = require('passport-http');
 // Boom para manejar errores en caso de que algo ocurra
 const boom = require("@hapi/boom");
 // Sirve para verificar si el password que esta pasando el usuario es correcto con el password que se tiene en el base de datos
 const bcrypt = require("bcrypt");
 
 // Encargado de buscar nuetsros usarios dado un query
-const UserService = require("../../../services/users");
+const UsersService = require("../../../services/users");
 
 // Hacemos uso de la estrategia basica
 passport.use(
   new BasicStrategy(async function(email, password, cb) {
-    const userServices = new UserService();
+    const userService = new UsersService();
 
     try {
       // Obtenemos los datos del usuario con ayuda de la capa de negocio
-      const user = userServices.getUser({ email });
+      const user = await userService.getUser({ email });
 
       // Validamos si existe el usuario, de lo contrario  retornamos en el callback un boom
       if (!user) {
@@ -36,3 +36,6 @@ passport.use(
     }
   })
 );
+
+
+
