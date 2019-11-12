@@ -16,6 +16,7 @@ const {
 } = require("../utils/schemas/movies");
 
 const validationHandler = require("../utils/middleware/validationHandler");
+const scopesValidationHandler = require("../utils/middleware/scopesValidationHandlers");
 
 // Funcionalidad para saber donde agregar cache
 const cacheResponse = require('../utils/cacheResponse');
@@ -28,8 +29,10 @@ const {
 //JWT Strategy
 require('../utils/auth/strategies/jwt');
 
-// Con este atributos protegemos nuestras rutas passport.authenticate('jwt',{session:false})
- 
+/**
+ * Con este atributos protegemos nuestras rutas passport.authenticate('jwt',{session:false})
+ * y validamos de que tenga autenticacion
+ */
 
 function moviesApi(app) {
   const router = express.Router();
@@ -38,26 +41,36 @@ function moviesApi(app) {
   // Instanciamos los servicios
   const moviesService = new MoviesService();
 
-  router.get("/", passport.authenticate('jwt', { session: false }), async function(req, res, next) {
-    cacheResponse(res, FIVE_MINUTES_IN_SECONDS);
-    //Se obtiene de la lestura de la Request y Response Object
-    const { tags } = req.query;
+  /**
+   * Este Endpoint solo puede leer péliculas 'read:movies',
+   */
+  router.get("/", 
+    passport.authenticate('jwt', { session: false }),
+    scopesValidationHandler(['read:movies']),
+    async function(req, res, next) {
+      cacheResponse(res, FIVE_MINUTES_IN_SECONDS);
+      //Se obtiene de la lestura de la Request y Response Object
+      const { tags } = req.query;
 
-    try {
-      const movies = await moviesService.getMovies({ tags });
+      try {
+        const movies = await moviesService.getMovies({ tags });
 
-      res.status(200).json({
-        data: movies,
-        message: "movies listed"
-      });
-    } catch (error) {
-      next(error);
-    }
+        res.status(200).json({
+          data: movies,
+          message: "movies listed"
+        });
+      } catch (error) {
+        next(error);
+      }
   });
 
+  /**
+   * Este Endpoint solo puede leer péliculas 'read:movies',
+   */
   router.get(
     "/:movieId",
     passport.authenticate('jwt', { session: false }),
+    scopesValidationHandler(['read:movies']),
     validationHandler({ movieId: movieIdSchema }, "params"),
     async function(req, res, next) {
       cacheResponse(res, SIXTY_MINUTES_IN_SECONDS);
@@ -82,7 +95,15 @@ function moviesApi(app) {
     }
   );
 
-  router.post("/", passport.authenticate('jwt', { session: false }), validationHandler(createMovieSchema), async function(
+
+  /**
+   * Este Endpoint solo puede cerar péliculas 'create:movies',
+   */
+  router.post(
+    "/",
+    passport.authenticate('jwt', { session: false }), 
+    scopesValidationHandler(['create:movies']),
+    validationHandler(createMovieSchema), async function(
     req,
     res,
     next
@@ -100,9 +121,13 @@ function moviesApi(app) {
     }
   });
 
+   /**
+   * Este Endpoint tiene el scope de actualizar péliculas 'update:movies',
+   */
   router.put(
     "/:movieId",
     passport.authenticate('jwt', { session: false }),
+    scopesValidationHandler(['update:movies']),
     validationHandler({ movieId: movieIdSchema }, "params"),
     validationHandler(updateMovieSchema),
     async function(req, res, next) {
@@ -124,23 +149,13 @@ function moviesApi(app) {
     }
   );
 
-  // router.patch('/:movieId', async function(req, res, next) {
-  //   const { movieId } = req.params;
-
-  //   try {
-  //     const updateDataMovieId = await moviesService.updateDataMovie({ movieId });
-  //     res.status(200).json({
-  //       data: updateDataMovieId,
-  //       message: 'data movie updated'
-  //     });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // });
-
+  /**
+   * Este Endpoint tiene el scope de borrar péliculas 'deleted:movies',
+   */
   router.delete(
     "/:movieId",
     passport.authenticate('jwt', { session: false }),
+    scopesValidationHandler(['delete:movies']),
     validationHandler({ movieId: movieIdSchema }, "params"),
     async function(req, res, next) {
       const { movieId } = req.params;
