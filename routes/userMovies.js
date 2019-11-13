@@ -11,7 +11,7 @@ const UserMoviesService = require("../services/userMovies");
 const validationHandler = require("../utils/middleware/validationHandler");
 
 // Validación de Scopes
-const scopesValidationHandler = require("../utils/middleware/scopesValidationHandlers");
+const scopesValidationHandler = require("../utils/middleware/scopesValidationHandler");
 
 //Schema's para validaro los endpoints
 const { movieIdSchema } = require("../utils/schemas/movies");

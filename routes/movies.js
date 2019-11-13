@@ -16,7 +16,7 @@ const {
 } = require("../utils/schemas/movies");
 
 const validationHandler = require("../utils/middleware/validationHandler");
-const scopesValidationHandler = require("../utils/middleware/scopesValidationHandlers");
+const scopesValidationHandler = require("../utils/middleware/scopesValidationHandler");
 
 // Funcionalidad para saber donde agregar cache
 const cacheResponse = require('../utils/cacheResponse');
