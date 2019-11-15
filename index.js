@@ -1,4 +1,5 @@
 const express = require("express");
+const helmet = require("helmet");
 const app = express();
 const debug = require("debug")("app:server");
 
@@ -16,6 +17,9 @@ const {
 const notFoundHandler = require("./utils/middleware/notFoundHandler.js");
 
 app.use(express.json()); // middleware body parser
+// Si quisieramos establecer parametros extras, lo unico que debmos hacer es psar
+// las configuraciones 
+app.use(helmet());
 
 // routes
 authApi(app);
